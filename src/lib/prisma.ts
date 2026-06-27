@@ -9,6 +9,7 @@ neonConfig.webSocketConstructor = ws
 const connectionString = process.env.DATABASE_URL!
 
 const pool = new Pool({ connectionString })
+// @ts-expect-error: Incompatibilidad temporal de tipos entre @neondatabase/serverless y Prisma adapter
 const adapter = new PrismaNeon(pool)
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
