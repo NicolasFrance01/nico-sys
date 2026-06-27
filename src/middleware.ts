@@ -1,5 +1,7 @@
-import { auth } from "@/auth"
-import { NextResponse } from "next-auth/middleware"
+import NextAuth from "next-auth"
+import { authConfig } from "./auth.config"
+
+export const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
@@ -7,14 +9,14 @@ export default auth((req) => {
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth')
 
   if (isApiAuthRoute) {
-    return NextResponse.next()
+    return 
   }
 
   if (isOnLoginPage) {
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL('/', req.nextUrl))
+      return Response.redirect(new URL('/', req.nextUrl))
     }
-    return NextResponse.next()
+    return 
   }
 
   if (!isLoggedIn) {
@@ -22,12 +24,8 @@ export default auth((req) => {
     if (req.nextUrl.search) {
       from += req.nextUrl.search;
     }
-    return NextResponse.redirect(
-      new URL(`/login?from=${encodeURIComponent(from)}`, req.nextUrl)
-    )
+    return Response.redirect(new URL(`/login?from=${encodeURIComponent(from)}`, req.nextUrl))
   }
-  
-  return NextResponse.next()
 })
 
 export const config = {
