@@ -2,7 +2,7 @@ import { defineConfig } from '@prisma/config'
 
 export default defineConfig({
   earlyAccess: true,
-  migrate: {
+  datasource: {
     url: process.env.DATABASE_URL,
   },
 })
