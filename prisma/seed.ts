@@ -1,38 +1,18 @@
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
-import 'dotenv/config'
-
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL
-    }
-  }
-})
+import { neon } from '@neondatabase/serverless';
+import bcrypt from 'bcryptjs';
+import 'dotenv/config';
 
 async function main() {
-  const password = await bcrypt.hash('Ndf010399', 10)
+  const sql = neon(process.env.DATABASE_URL!);
+  const password = await bcrypt.hash('Ndf010399', 10);
   
-  const user = await prisma.user.upsert({
-    where: { username: 'nfrance' },
-    update: {},
-    create: {
-      username: 'nfrance',
-      password,
-      role: 'ADMIN',
-    },
-  })
+  await sql`
+    INSERT INTO "User" (id, username, password, role, "createdAt")
+    VALUES ('cuid_admin', 'nfrance', ${password}, 'ADMIN', NOW())
+    ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password;
+  `;
   
-  console.log('Seed completed successfully:')
-  console.log(user)
+  console.log('Seed completed successfully!');
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+main().catch(console.error);
