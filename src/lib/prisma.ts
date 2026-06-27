@@ -1,19 +1,14 @@
 import 'dotenv/config'
-import { Pool, neonConfig } from '@neondatabase/serverless'
-import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
-import ws from 'ws'
-
-neonConfig.webSocketConstructor = ws
-
-const connectionString = process.env.DATABASE_URL!
-
-const pool = new Pool({ connectionString })
-// @ts-expect-error: Incompatibilidad temporal de tipos entre @neondatabase/serverless y Prisma adapter
-const adapter = new PrismaNeon(pool)
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter })
+export const prisma = globalForPrisma.prisma || new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+})
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
