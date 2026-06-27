@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  systems   System[]
+  createdAt DateTime @default(now())
+}
+
+enum SystemType {
+  PROPIO
+  CLIENTE
+  ALGEIBA
+  DEMO
+  ARCHIVADO
+}
+
+enum SystemEnv {
+  PROD
+  TEST_NICO
+  QA
+  DEV
+  LOCAL
+}
+
+enum SystemStatus {
+  ACTIVO
+  EN_DESARROLLO
+  PAUSADO
+  ARCHIVADO
+}
+
+model System {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  type        SystemType
+  env         SystemEnv
+  status      SystemStatus
+  clientId    String?
+  client      Client?      @relation(fields: [clientId], references: [id])
+  repoUrl     String?
+  techs       String[]
+  notes       String?
+
+  urls        SystemUrl[]
+  credentials Credential[]
+  payments    PaymentHistory[]
+  tags        Tag[]            @relation("SystemTags")
+  attachments Attachment[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemUrl {
+  id       String @id @default(cuid())
+  name     String
+  url      String
+  systemId String
+  system   System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}
+
+model Credential {
+  id       String  @id @default(cuid())
+  name     String
+  username String?
+  password String
+  systemId String
+  system   System  @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+  VENCIDO
+}
+
+model PaymentHistory {
+  id           String        @id @default(cuid())
+  date         DateTime
+  amount       Float
+  observations String?
+  method       String
+  status       PaymentStatus
+  systemId     String
+  system       System        @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  color   String   @default("#000000")
+  systems System[] @relation("SystemTags")
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model Attachment {
+  id       String @id @default(cuid())
+  name     String
+  url      String
+  systemId String
+  system   System @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}
