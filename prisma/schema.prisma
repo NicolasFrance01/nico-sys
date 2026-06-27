@@ -48,6 +48,7 @@ model System {
   id          String       @id @default(cuid())
   name        String
   description String?
+  subtype     String?
   type        SystemType
   env         SystemEnv
   status      SystemStatus
@@ -56,6 +57,7 @@ model System {
   repoUrl     String?
   techs       String[]
   notes       String?
+  nextPaymentDate DateTime?
 
   urls        SystemUrl[]
   credentials Credential[]
