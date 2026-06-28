@@ -24,7 +24,7 @@ export default function LoginPage() {
       >
         <div className="flex justify-center mb-8">
           <Image 
-            src="/logosys.png" 
+            src="/logosyss.png" 
             alt="NicoSys Manager" 
             width={180} 
             height={60}
