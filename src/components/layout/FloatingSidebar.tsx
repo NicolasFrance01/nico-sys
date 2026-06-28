@@ -84,7 +84,11 @@ export function FloatingSidebar({ userName }: { userName: string }) {
           </div>
           <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-zinc-200 text-sm font-medium opacity-0 -translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-xl whitespace-nowrap z-50 flex items-center gap-3">
             <span>{userName}</span>
-            <LogOut size={14} className="text-red-400 hover:text-red-300" onClick={(e) => { e.preventDefault(); /* todo logout */ }} />
+            <LogOut size={14} className="text-red-400 hover:text-red-300" onClick={async (e) => { 
+              e.preventDefault(); 
+              const { signOut } = await import("next-auth/react");
+              await signOut({ callbackUrl: "/login" });
+            }} />
           </div>
         </Link>
       </div>
