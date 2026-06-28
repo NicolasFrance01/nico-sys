@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Server, Calendar, Building2, Terminal } from "lucide-react"
+import { ArrowLeft, Server, Calendar, Building2, Terminal, Globe, Lock, Mail, ExternalLink, Copy } from "lucide-react"
 
 export const revalidate = 0
 
@@ -12,6 +12,8 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
     where: { id: resolvedParams.id },
     include: {
       client: true,
+      urls: true,
+      credentials: true
     }
   })
 
@@ -56,21 +58,105 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* DETALLES EXTRA */}
-      <div className="grid md:grid-cols-2 gap-16">
+      {/* DETALLES EXTRA: URLs, Credenciales, Notas */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        
+        {/* COLUMNA IZQUIERDA: URLs y Credenciales */}
+        <div className="space-y-8">
+          
+          {/* URLs */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <Globe className="text-blue-400" size={24} />
+              <h2 className="text-2xl font-bold text-white">URLs del Sistema</h2>
+            </div>
+            
+            <div className="space-y-4">
+              {sys.urls.length > 0 ? (
+                sys.urls.map(url => (
+                  <a key={url.id} href={url.url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between p-5 rounded-2xl bg-zinc-900/30 border border-white/5 hover:bg-zinc-800/50 hover:border-white/10 transition-all">
+                    <div>
+                      <p className="text-white font-semibold">{url.name}</p>
+                      <p className="text-blue-400 font-mono text-sm mt-1 group-hover:underline">{url.url}</p>
+                    </div>
+                    <ExternalLink size={18} className="text-zinc-500 group-hover:text-white transition-colors" />
+                  </a>
+                ))
+              ) : (
+                <div className="p-6 rounded-2xl bg-zinc-900/10 border border-white/5 border-dashed text-center">
+                  <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">No hay URLs registradas.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* CREDENCIALES */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <Lock className="text-emerald-400" size={24} />
+              <h2 className="text-2xl font-bold text-white">Credenciales</h2>
+            </div>
+            
+            <div className="space-y-4">
+              {sys.credentials.length > 0 ? (
+                sys.credentials.map(cred => (
+                  <div key={cred.id} className="p-6 rounded-2xl bg-zinc-900/30 border border-white/5 relative overflow-hidden group">
+                    {/* Efecto de borde */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/50" />
+                    
+                    <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                      {cred.name.toLowerCase().includes('mail') || cred.name.toLowerCase().includes('correo') ? <Mail size={16} className="text-zinc-400" /> : <Lock size={16} className="text-zinc-400" />}
+                      {cred.name}
+                    </h3>
+                    
+                    <div className="grid gap-3">
+                      <div className="flex items-center justify-between bg-black/40 rounded-xl p-3 border border-white/5">
+                        <div>
+                          <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest mb-1">Usuario / Email</p>
+                          <p className="text-zinc-200 font-mono text-sm">{cred.username || '-'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between bg-black/40 rounded-xl p-3 border border-white/5">
+                        <div>
+                          <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest mb-1">Contraseña</p>
+                          <p className="text-zinc-200 font-mono text-sm tracking-widest select-all">{cred.password}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-6 rounded-2xl bg-zinc-900/10 border border-white/5 border-dashed text-center">
+                  <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">No hay credenciales registradas.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* COLUMNA DERECHA: Descripción y Notas */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-6">Descripción & Notas</h2>
-          <div className="rounded-3xl bg-zinc-900/30 border border-white/5 p-8 backdrop-blur-md">
-             {sys.description || sys.notes ? (
-               <div className="space-y-6 text-zinc-300">
-                 {sys.description && <p>{sys.description}</p>}
-                 {sys.notes && <p className="font-mono text-sm opacity-70">{sys.notes}</p>}
-               </div>
-             ) : (
-               <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">Sin información detallada.</p>
-             )}
+          <div className="sticky top-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Descripción & Notas Generales</h2>
+            <div className="rounded-3xl bg-zinc-900/30 border border-white/5 p-8 backdrop-blur-md">
+               {sys.description || sys.notes ? (
+                 <div className="space-y-6 text-zinc-300">
+                   {sys.description && <p className="leading-relaxed">{sys.description}</p>}
+                   {sys.notes && (
+                     <div className="pt-6 border-t border-white/5">
+                        <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest mb-3">Notas Internas</p>
+                        <p className="font-mono text-sm text-zinc-400 leading-relaxed whitespace-pre-wrap">{sys.notes}</p>
+                     </div>
+                   )}
+                 </div>
+               ) : (
+                 <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest text-center py-4">Sin información detallada.</p>
+               )}
+            </div>
           </div>
         </div>
+
       </div>
 
     </div>
