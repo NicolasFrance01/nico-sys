@@ -13,11 +13,16 @@ export default async function ClientesPage() {
     }
   })
 
+  const allSystemsRaw = await prisma.system.findMany({
+    select: { id: true, name: true, type: true, subtype: true }
+  })
+
   const initialData = clientsRaw.map(c => ({
     id: c.id,
     name: c.name,
     createdAt: c.createdAt,
-    systemsCount: c.systems.length
+    systemsCount: c.systems.length,
+    systems: c.systems.map(s => ({ id: s.id, name: s.name }))
   }))
 
   return (
@@ -34,7 +39,7 @@ export default async function ClientesPage() {
         </h1>
       </div>
 
-      <ClientsTable initialData={initialData} />
+      <ClientsTable initialData={initialData} allSystems={allSystemsRaw} />
 
     </div>
   )
