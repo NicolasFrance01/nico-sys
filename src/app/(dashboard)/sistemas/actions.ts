@@ -19,17 +19,25 @@ export async function deleteSystem(id: string) {
 
 export async function createSystem(data: {
   name: string
-  type: SystemType
+  type: string
   env: SystemEnv
   status: SystemStatus
   clientId?: string | null
   nextPaymentDate?: Date | null
 }) {
   try {
+    let actualType: SystemType = data.type as SystemType;
+    let subtype: string | null = null;
+    if (data.type === 'ATLASCORE') {
+      actualType = SystemType.CLIENTE;
+      subtype = 'Atlascore';
+    }
+
     const sys = await prisma.system.create({
       data: {
         name: data.name,
-        type: data.type,
+        type: actualType,
+        subtype: subtype,
         env: data.env,
         status: data.status,
         clientId: data.clientId || null,
@@ -46,18 +54,29 @@ export async function createSystem(data: {
 
 export async function updateSystem(id: string, data: {
   name: string
-  type: SystemType
+  type: string
   env: SystemEnv
   status: SystemStatus
   clientId?: string | null
   nextPaymentDate?: Date | null
 }) {
   try {
+    let actualType: SystemType = data.type as SystemType;
+    let subtype: string | null = null;
+    if (data.type === 'ATLASCORE') {
+      actualType = SystemType.CLIENTE;
+      subtype = 'Atlascore';
+    } else {
+      // Si antes era Atlascore y ahora lo cambian a PROPIO, se borra el subtype.
+      subtype = null;
+    }
+
     const sys = await prisma.system.update({
       where: { id },
       data: {
         name: data.name,
-        type: data.type,
+        type: actualType,
+        subtype: subtype,
         env: data.env,
         status: data.status,
         clientId: data.clientId || null,

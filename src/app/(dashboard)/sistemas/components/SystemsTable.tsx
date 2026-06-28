@@ -160,7 +160,7 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
                     <td className="px-6 py-5">
                       <div className="flex gap-2">
                         <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-white/10 text-zinc-200 border border-white/10">
-                          {sys.type}
+                          {sys.subtype === 'Atlascore' ? 'ATLASCORE' : sys.type}
                         </span>
                         <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-violet-500/20 text-violet-300 border border-violet-500/30">
                           {sys.env}
@@ -231,6 +231,7 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
                     <option value="PROPIO">PROPIO</option>
                     <option value="CLIENTE">CLIENTE</option>
                     <option value="ALGEIBA">ALGEIBA</option>
+                    <option value="ATLASCORE">ATLASCORE</option>
                   </select>
                 </div>
                 <div>
@@ -286,10 +287,11 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Tipo</label>
-                  <select defaultValue={systemToEdit.type} name="type" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none appearance-none">
+                  <select defaultValue={systemToEdit.subtype === 'Atlascore' ? 'ATLASCORE' : systemToEdit.type} name="type" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none appearance-none">
                     <option value="PROPIO">PROPIO</option>
                     <option value="CLIENTE">CLIENTE</option>
                     <option value="ALGEIBA">ALGEIBA</option>
+                    <option value="ATLASCORE">ATLASCORE</option>
                   </select>
                 </div>
                 <div>
