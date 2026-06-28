@@ -17,6 +17,9 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "NicoSys Manager",
   description: "Gestor personal de sistemas, clientes y proyectos.",
+  icons: {
+    icon: '/faviconsys.png',
+  },
 };
 
 export default function RootLayout({
