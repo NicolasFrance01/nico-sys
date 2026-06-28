@@ -44,5 +44,30 @@ export async function createSystem(data: {
   }
 }
 
-// Para editar, simplemente pasaremos un ID y los mismos datos.
-// Pero la vista dinámica `/sistemas/[id]` requerirá su propia página.
+export async function updateSystem(id: string, data: {
+  name: string
+  type: SystemType
+  env: SystemEnv
+  status: SystemStatus
+  clientId?: string | null
+  nextPaymentDate?: Date | null
+}) {
+  try {
+    const sys = await prisma.system.update({
+      where: { id },
+      data: {
+        name: data.name,
+        type: data.type,
+        env: data.env,
+        status: data.status,
+        clientId: data.clientId || null,
+        nextPaymentDate: data.nextPaymentDate || null
+      }
+    })
+    revalidatePath('/')
+    revalidatePath('/sistemas')
+    return { success: true, data: sys }
+  } catch (error) {
+    return { success: false, error: "No se pudo actualizar el sistema." }
+  }
+}

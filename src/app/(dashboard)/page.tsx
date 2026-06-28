@@ -39,22 +39,22 @@ export default async function DashboardPage() {
       </div>
 
       {/* MASSIVE METRICS ROW */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16 border-t border-white/5 pt-16">
-        <div className="flex flex-col">
-          <span className="text-8xl font-black tracking-tighter text-white">{total}</span>
-          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Sistemas Activos</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16 border-t border-white/5 pt-12">
+        <div className="flex flex-col justify-end h-32">
+          <span className="text-6xl md:text-7xl font-black tracking-tighter text-white leading-none">{total}</span>
+          <span className="text-zinc-500 font-mono text-xs md:text-sm mt-4 uppercase tracking-widest">Sistemas Activos</span>
         </div>
-        <div className="flex flex-col">
-          <span className="text-7xl font-black tracking-tighter text-emerald-400 opacity-90">{clientes}</span>
-          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Clientes</span>
+        <div className="flex flex-col justify-end h-32">
+          <span className="text-5xl md:text-6xl font-black tracking-tighter text-emerald-400 opacity-90 leading-none">{clientes}</span>
+          <span className="text-zinc-500 font-mono text-xs md:text-sm mt-4 uppercase tracking-widest">Clientes</span>
         </div>
-        <div className="flex flex-col">
-          <span className="text-7xl font-black tracking-tighter text-blue-400 opacity-90">{propios}</span>
-          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Propios</span>
+        <div className="flex flex-col justify-end h-32">
+          <span className="text-5xl md:text-6xl font-black tracking-tighter text-blue-400 opacity-90 leading-none">{propios}</span>
+          <span className="text-zinc-500 font-mono text-xs md:text-sm mt-4 uppercase tracking-widest">Propios</span>
         </div>
-        <div className="flex flex-col">
-          <span className="text-7xl font-black tracking-tighter text-orange-400 opacity-90">{algeiba}</span>
-          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Algeiba</span>
+        <div className="flex flex-col justify-end h-32">
+          <span className="text-5xl md:text-6xl font-black tracking-tighter text-orange-400 opacity-90 leading-none">{algeiba}</span>
+          <span className="text-zinc-500 font-mono text-xs md:text-sm mt-4 uppercase tracking-widest">Algeiba</span>
         </div>
       </div>
 

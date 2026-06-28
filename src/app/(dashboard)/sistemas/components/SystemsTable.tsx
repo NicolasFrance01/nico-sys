@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Search, Plus, Edit2, Trash2, Filter, X } from "lucide-react"
 import Link from "next/link"
-import { deleteSystem, createSystem } from "../actions"
+import { deleteSystem, createSystem, updateSystem } from "../actions"
 
 type SystemData = {
   id: string
@@ -20,6 +20,8 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("ALL")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [systemToEdit, setSystemToEdit] = useState<SystemData | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Filter systems directly from props so UI updates on Revalidate
@@ -40,15 +42,42 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
     setIsSubmitting(true)
     const formData = new FormData(e.currentTarget)
     
+    const paymentDateStr = formData.get("nextPaymentDate") as string
+    const paymentDate = paymentDateStr ? new Date(paymentDateStr) : null
+    
     await createSystem({
       name: formData.get("name") as string,
       type: formData.get("type") as any,
       env: formData.get("env") as any,
       status: formData.get("status") as any,
+      nextPaymentDate: paymentDate
     })
     
     setIsSubmitting(false)
     setIsModalOpen(false)
+  }
+
+  async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if(!systemToEdit) return
+    setIsSubmitting(true)
+    // Here we'd call an update action (which we need to write)
+    const formData = new FormData(e.currentTarget)
+    
+    const paymentDateStr = formData.get("nextPaymentDate") as string
+    const paymentDate = paymentDateStr ? new Date(paymentDateStr) : null
+
+    await updateSystem(systemToEdit.id, {
+      name: formData.get("name") as string,
+      type: formData.get("type") as any,
+      env: formData.get("env") as any,
+      status: formData.get("status") as any,
+      nextPaymentDate: paymentDate
+    })
+
+    setIsSubmitting(false)
+    setIsEditModalOpen(false)
+    setSystemToEdit(null)
   }
 
   return (
@@ -148,7 +177,7 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
                         <Link href={`/sistemas/${sys.id}`} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors" title="Detalles">
                           <Search size={16} />
                         </Link>
-                        <button className="p-2 rounded-xl bg-white/5 hover:bg-blue-500/20 text-zinc-400 hover:text-blue-400 transition-colors" title="Editar">
+                        <button onClick={() => { setSystemToEdit(sys); setIsEditModalOpen(true); }} className="p-2 rounded-xl bg-white/5 hover:bg-blue-500/20 text-zinc-400 hover:text-blue-400 transition-colors" title="Editar">
                           <Edit2 size={16} />
                         </button>
                         <button onClick={() => handleDelete(sys.id)} className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors" title="Eliminar">
@@ -207,17 +236,82 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Estado Inicial</label>
-                <select name="status" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-violet-500 focus:outline-none appearance-none">
-                  <option value="ACTIVO">ACTIVO</option>
-                  <option value="EN_DESARROLLO">EN DESARROLLO</option>
-                  <option value="PAUSADO">PAUSADO</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Estado Inicial</label>
+                  <select name="status" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-violet-500 focus:outline-none appearance-none">
+                    <option value="ACTIVO">ACTIVO</option>
+                    <option value="EN_DESARROLLO">EN DESARROLLO</option>
+                    <option value="PAUSADO">PAUSADO</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Fecha de Cobro (Opcional)</label>
+                  <input name="nextPaymentDate" type="date" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-violet-500 focus:outline-none [color-scheme:dark]" />
+                </div>
               </div>
 
               <button disabled={isSubmitting} type="submit" className="w-full rounded-xl bg-white hover:bg-zinc-200 py-4 text-sm font-black text-black uppercase tracking-widest transition-colors mt-4">
                 {isSubmitting ? 'Creando...' : 'Desplegar Sistema'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
+      {isEditModalOpen && systemToEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-8 w-full max-w-md shadow-[0_0_100px_rgba(59,130,246,0.15)]">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-black text-white">Editar Sistema</h2>
+              <button onClick={() => { setIsEditModalOpen(false); setSystemToEdit(null); }} className="p-2 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEdit} className="space-y-6">
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Nombre del Sistema</label>
+                <input required defaultValue={systemToEdit.name} name="name" type="text" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none" />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Tipo</label>
+                  <select defaultValue={systemToEdit.type} name="type" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none appearance-none">
+                    <option value="PROPIO">PROPIO</option>
+                    <option value="CLIENTE">CLIENTE</option>
+                    <option value="ALGEIBA">ALGEIBA</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Entorno</label>
+                  <select defaultValue={systemToEdit.env} name="env" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none appearance-none">
+                    <option value="PROD">PROD</option>
+                    <option value="TEST_NICO">TEST_NICO</option>
+                    <option value="LOCAL">LOCAL</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Estado Inicial</label>
+                  <select defaultValue={systemToEdit.status} name="status" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none appearance-none">
+                    <option value="ACTIVO">ACTIVO</option>
+                    <option value="EN_DESARROLLO">EN DESARROLLO</option>
+                    <option value="PAUSADO">PAUSADO</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Fecha de Cobro (Opcional)</label>
+                  <input defaultValue={systemToEdit.nextPaymentDate ? new Date(systemToEdit.nextPaymentDate).toISOString().split('T')[0] : ''} name="nextPaymentDate" type="date" className="w-full rounded-xl border border-white/10 bg-black py-3 px-4 text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]" />
+                </div>
+              </div>
+
+              <button disabled={isSubmitting} type="submit" className="w-full rounded-xl bg-white hover:bg-zinc-200 py-4 text-sm font-black text-black uppercase tracking-widest transition-colors mt-4">
+                {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
               </button>
             </form>
           </div>
