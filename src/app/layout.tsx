@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "NicoSys Manager",
   description: "Gestor personal de sistemas, clientes y proyectos.",
   icons: {
-    icon: '/faviconsys.png',
+    icon: '/faviconsyss.png',
   },
 };
 
