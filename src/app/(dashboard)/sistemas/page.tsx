@@ -14,11 +14,11 @@ export default async function SistemasPage() {
     }
   })
 
-  // Preprocesar los datos para pasarlos limpios al componente de cliente
   const initialData = systemsRaw.map(sys => ({
     id: sys.id,
     name: sys.name,
     type: sys.type,
+    subtype: sys.subtype,
     env: sys.env,
     status: sys.status,
     clientName: sys.client?.name || null,

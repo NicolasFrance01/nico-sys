@@ -9,6 +9,7 @@ type SystemData = {
   id: string
   name: string
   type: string
+  subtype?: string | null
   env: string
   status: string
   clientName: string | null
@@ -28,7 +29,12 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
   const filteredSystems = initialData.filter(sys => {
     const matchesSearch = sys.name.toLowerCase().includes(search.toLowerCase()) || 
                           (sys.clientName || "").toLowerCase().includes(search.toLowerCase())
-    const matchesType = typeFilter === "ALL" || sys.type === typeFilter
+    
+    let matchesType = false
+    if (typeFilter === "ALL") matchesType = true
+    else if (typeFilter === "ATLASCORE") matchesType = sys.subtype === "Atlascore"
+    else matchesType = sys.type === typeFilter
+
     return matchesSearch && matchesType
   })
 
@@ -106,6 +112,7 @@ export function SystemsTable({ initialData }: { initialData: SystemData[] }) {
               <option value="PROPIO">PROPIOS</option>
               <option value="CLIENTE">CLIENTES</option>
               <option value="ALGEIBA">ALGEIBA</option>
+              <option value="ATLASCORE">ATLASCORE</option>
             </select>
             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={16} />
           </div>
