@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { SystemType } from "@prisma/client"
-import { Server, Grid, Users, ArrowUpRight, ShieldCheck, Wallet } from "lucide-react"
+import { ArrowRight, Server, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 
 export const revalidate = 0
@@ -13,109 +13,108 @@ export default async function DashboardPage() {
     prisma.system.count({ where: { type: SystemType.ALGEIBA } }),
     prisma.system.findMany({
       orderBy: { updatedAt: 'desc' },
-      take: 5,
+      take: 4,
       include: { client: true }
     }),
     prisma.system.findMany({
       where: { nextPaymentDate: { not: null } },
       orderBy: { nextPaymentDate: 'asc' },
-      take: 4
+      take: 3
     })
   ])
 
-  const stats = [
-    { title: "Total Sistemas", value: total, icon: Grid, color: "text-violet-400", bg: "bg-violet-500/10" },
-    { title: "Sistemas Propios", value: propios, icon: Server, color: "text-blue-400", bg: "bg-blue-500/10" },
-    { title: "Sistemas Clientes", value: clientes, icon: Users, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-    { title: "Sistemas Algeiba", value: algeiba, icon: ShieldCheck, color: "text-orange-400", bg: "bg-orange-500/10" },
-  ]
-
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
+    <div className="max-w-[1400px] mx-auto space-y-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-32">
       
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Overview</h1>
-        <p className="mt-2 text-zinc-400">Resumen general del estado de tu infraestructura y finanzas.</p>
+      {/* HERO SECTION - Editorial Style */}
+      <div className="pt-12">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="h-[1px] w-12 bg-violet-500" />
+          <p className="text-violet-400 font-mono text-sm tracking-widest uppercase">Centro de Comando</p>
+        </div>
+        <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white leading-[0.9]">
+          Visión <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-700">Global.</span>
+        </h1>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <div key={i} className="rounded-2xl border border-white/5 bg-zinc-900/40 backdrop-blur-md p-6 hover:bg-zinc-900/60 transition-colors">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-zinc-400">{stat.title}</p>
-              <div className={`p-2 rounded-lg ${stat.bg} ${stat.color}`}>
-                <stat.icon size={18} />
-              </div>
-            </div>
-            <p className="mt-4 text-3xl font-bold text-white">{stat.value}</p>
-          </div>
-        ))}
+      {/* MASSIVE METRICS ROW */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16 border-t border-white/5 pt-16">
+        <div className="flex flex-col">
+          <span className="text-8xl font-black tracking-tighter text-white">{total}</span>
+          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Sistemas Activos</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-7xl font-black tracking-tighter text-emerald-400 opacity-90">{clientes}</span>
+          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Clientes</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-7xl font-black tracking-tighter text-blue-400 opacity-90">{propios}</span>
+          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Propios</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-7xl font-black tracking-tighter text-orange-400 opacity-90">{algeiba}</span>
+          <span className="text-zinc-500 font-mono text-sm mt-2 uppercase tracking-widest">Algeiba</span>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Próximos Vencimientos */}
-        <div className="lg:col-span-2 rounded-2xl border border-white/5 bg-zinc-900/40 backdrop-blur-md p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
-                <Wallet size={18} />
-              </div>
-              <h3 className="font-semibold text-white">Próximos Cobros</h3>
-            </div>
-            <Link href="/sistemas" className="text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors">
-              Ver todos <ArrowUpRight size={16} />
-            </Link>
-          </div>
-          
-          <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-zinc-500 border-b border-white/5">
-                <tr>
-                  <th className="pb-3 font-medium">Sistema</th>
-                  <th className="pb-3 font-medium">Estado</th>
-                  <th className="pb-3 font-medium text-right">Fecha Venc.</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {ultimosPagos.map((pago, idx) => {
-                  const diffTime = (pago.nextPaymentDate?.getTime() || 0) - new Date().getTime();
-                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                  const isUrgent = diffDays <= 7;
+      <div className="grid lg:grid-cols-2 gap-16">
+        {/* RADICAL FINANCE SECTION */}
+        <div className="relative group">
+          <div className="absolute -inset-4 bg-gradient-to-r from-red-500/10 to-transparent blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          <div className="relative">
+            <h2 className="text-3xl font-bold tracking-tight text-white mb-8">Radar de Vencimientos</h2>
+            <div className="space-y-6">
+              {ultimosPagos.map((pago, idx) => {
+                const diffTime = (pago.nextPaymentDate?.getTime() || 0) - new Date().getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const isUrgent = diffDays <= 7;
 
-                  return (
-                    <tr key={idx} className="group">
-                      <td className="py-4 text-zinc-200 font-medium">{pago.name}</td>
-                      <td className="py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold ${isUrgent ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${isUrgent ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                          {isUrgent ? `Vence en ${diffDays} días` : 'Al día'}
-                        </span>
-                      </td>
-                      <td className={`py-4 text-right font-semibold ${isUrgent ? 'text-red-400' : 'text-zinc-400'}`}>
-                        {pago.nextPaymentDate?.toLocaleDateString('es-ES')}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                return (
+                  <div key={idx} className="flex items-center justify-between group/row">
+                    <div className="flex items-center gap-6">
+                      <div className={`w-2 h-12 rounded-full ${isUrgent ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-emerald-500'}`} />
+                      <div>
+                        <p className="text-2xl font-bold text-zinc-200 group-hover/row:text-white transition-colors">{pago.name}</p>
+                        <p className="text-zinc-500 text-sm font-mono mt-1">{isUrgent ? `ALERTA: Vence en ${diffDays} días` : 'ESTADO: Al día'}</p>
+                      </div>
+                    </div>
+                    <div className={`text-xl font-mono tracking-tighter ${isUrgent ? 'text-red-400' : 'text-emerald-400'}`}>
+                      {pago.nextPaymentDate?.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }).toUpperCase()}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            
+            <div className="mt-10">
+               <Link href="/sistemas" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors group/btn">
+                  Ver todos los cobros 
+                  <ArrowRight size={16} className="group-hover/btn:translate-x-2 transition-transform" />
+               </Link>
+            </div>
           </div>
         </div>
 
-        {/* Sistemas Recientes */}
-        <div className="rounded-2xl border border-white/5 bg-zinc-900/40 backdrop-blur-md p-6">
-          <h3 className="font-semibold text-white mb-6">Actividad Reciente</h3>
-          <div className="space-y-4">
+        {/* RECENT ACTIVITY - MINIMALIST */}
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-8">Últimos Despliegues</h2>
+          <div className="divide-y divide-white/5 border-t border-white/5">
             {ultimosSistemas.map(sys => (
-              <div key={sys.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group border border-transparent hover:border-white/5">
-                <div>
-                  <p className="font-medium text-zinc-200">{sys.name}</p>
-                  <p className="text-xs text-zinc-500 mt-1">{sys.type}</p>
+              <div key={sys.id} className="py-6 flex justify-between items-center group/sys">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-full border border-white/10 flex items-center justify-center text-zinc-500 group-hover/sys:bg-white group-hover/sys:text-black transition-all">
+                    {sys.type === 'ALGEIBA' ? <ShieldCheck size={16} /> : <Server size={16} />}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-zinc-300 group-hover/sys:text-white transition-colors">{sys.name}</h3>
+                    <p className="text-xs font-mono text-zinc-600 mt-1">{sys.env} // {sys.type}</p>
+                  </div>
                 </div>
-                <div className="text-xs font-medium text-zinc-400 bg-white/5 px-2 py-1 rounded-md">
-                  {sys.status}
+                <div className="text-right">
+                  <span className="inline-block px-3 py-1 rounded-full border border-white/10 text-[10px] uppercase tracking-widest text-zinc-400">
+                    {sys.status}
+                  </span>
                 </div>
               </div>
             ))}
