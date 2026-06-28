@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Server, Calendar, Building2, Terminal, Globe, Lock, ExternalLink } from "lucide-react"
+import { ArrowLeft, Server, Calendar, Building2, Terminal, Globe, Lock, ExternalLink, Wallet } from "lucide-react"
 import { CredentialCard } from "./components/CredentialCard"
 
 export const revalidate = 0
@@ -14,7 +14,10 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
     include: {
       client: true,
       urls: true,
-      credentials: true
+      credentials: true,
+      payments: {
+        orderBy: { date: 'desc' }
+      }
     }
   })
 
@@ -127,6 +130,68 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
             ) : (
               <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest text-center py-4">Sin información detallada.</p>
             )}
+        </div>
+      </div>
+
+      {/* BLOQUE INFERIOR: Historial de Pagos */}
+      <div className="pt-8">
+        <div className="flex items-center gap-3 mb-6">
+          <Wallet className="text-amber-400" size={24} />
+          <h2 className="text-2xl font-bold text-white">Historial de Pagos</h2>
+        </div>
+        
+        <div className="rounded-3xl bg-zinc-900/30 border border-white/5 overflow-hidden backdrop-blur-md">
+          {sys.payments.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="border-b border-white/5 text-zinc-500 font-mono uppercase tracking-widest text-xs bg-black/40">
+                  <tr>
+                    <th className="px-8 py-6 font-semibold">Fecha</th>
+                    <th className="px-8 py-6 font-semibold">Estado</th>
+                    <th className="px-8 py-6 font-semibold">Monto</th>
+                    <th className="px-8 py-6 font-semibold">Método</th>
+                    <th className="px-8 py-6 font-semibold">Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {sys.payments.map((payment) => (
+                    <tr key={payment.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="px-8 py-6 text-white font-mono">
+                        {payment.date.toLocaleDateString('es-ES')}
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border ${
+                          payment.status === 'PAGADO' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                          payment.status === 'VENCIDO' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                          'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            payment.status === 'PAGADO' ? 'bg-emerald-500' :
+                            payment.status === 'VENCIDO' ? 'bg-red-500' :
+                            'bg-amber-500'
+                          }`} />
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 font-mono text-zinc-300">
+                        ${payment.amount.toLocaleString()}
+                      </td>
+                      <td className="px-8 py-6 font-mono text-zinc-500 text-xs tracking-widest uppercase">
+                        {payment.method || '-'}
+                      </td>
+                      <td className="px-8 py-6 text-zinc-400 text-sm">
+                        {payment.observations || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="p-12 text-center border-dashed border-t-0">
+              <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">No hay registros de pago en el historial.</p>
+            </div>
+          )}
         </div>
       </div>
 
