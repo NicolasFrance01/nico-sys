@@ -43,7 +43,7 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
       </div>
 
       {/* METADATA GRID */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 border-y border-white/5 py-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-12 border-y border-white/5 py-12">
         <div className="flex flex-col gap-2">
           <span className="text-zinc-500 font-mono text-xs uppercase tracking-widest flex items-center gap-2"><Server size={14}/> Estado Actual</span>
           <span className="text-3xl font-black tracking-tighter text-white uppercase">{sys.status}</span>
@@ -57,10 +57,6 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
           <span className={`text-3xl font-black tracking-tighter ${sys.nextPaymentDate ? 'text-amber-400' : 'text-zinc-700'}`}>
             {sys.nextPaymentDate ? sys.nextPaymentDate.toLocaleDateString('es-ES') : 'N/A'}
           </span>
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="text-zinc-500 font-mono text-xs uppercase tracking-widest flex items-center gap-2"><Terminal size={14}/> ID Único</span>
-          <span className="text-xl font-mono text-zinc-400">{sys.id.split('-')[0]}...</span>
         </div>
       </div>
 
