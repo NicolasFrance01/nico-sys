@@ -1,22 +1,33 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Mail, Eye } from "lucide-react"
+import { Lock, Mail, Eye, Loader2 } from "lucide-react"
+import { revealPassword } from "../actions"
 
 export function CredentialCard({ cred }: { cred: { id: string, name: string, username: string | null, password: string } }) {
   const [isRevealed, setIsRevealed] = useState(false)
+  const [plainPassword, setPlainPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleReveal = () => {
+  const handleReveal = async () => {
     if (isRevealed) {
       setIsRevealed(false)
+      setPlainPassword("")
       return
     }
 
-    const master = window.prompt("Ingrese la clave maestra para revelar esta credencial:")
-    if (master === "010399") {
+    const pin = window.prompt("Ingrese la clave maestra para revelar esta credencial:")
+    if (!pin) return
+
+    setIsLoading(true)
+    const result = await revealPassword(cred.id, pin)
+    setIsLoading(false)
+
+    if (result.success && result.data) {
+      setPlainPassword(result.data)
       setIsRevealed(true)
-    } else if (master !== null) {
-      alert("Clave maestra incorrecta.")
+    } else {
+      alert(result.error || "Clave maestra incorrecta o error al descifrar.")
     }
   }
 
@@ -45,10 +56,10 @@ export function CredentialCard({ cred }: { cred: { id: string, name: string, use
         >
           <div>
             <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest mb-1 flex items-center gap-2">
-              Contraseña <Eye size={10} className="opacity-50" />
+              Contraseña {isLoading ? <Loader2 size={10} className="animate-spin text-blue-400" /> : <Eye size={10} className="opacity-50" />}
             </p>
             <p className="text-emerald-400 font-mono text-sm tracking-widest">
-              {isRevealed ? cred.password : "••••••••••••••••"}
+              {isRevealed ? plainPassword : "••••••••••••••••"}
             </p>
           </div>
         </div>
