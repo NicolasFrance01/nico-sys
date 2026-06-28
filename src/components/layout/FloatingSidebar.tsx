@@ -69,21 +69,24 @@ export function FloatingSidebar({ userName }: { userName: string }) {
 
       {/* Bottom Actions */}
       <div className="flex flex-col gap-4">
-        <button className="group relative flex h-12 w-12 items-center justify-center">
+        <Link href="/perfil" className="group relative flex h-12 w-12 items-center justify-center">
           <Settings2 strokeWidth={1.5} className="text-zinc-500 group-hover:text-zinc-300 transition-colors" size={24} />
-        </button>
+          <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-zinc-200 text-sm font-medium opacity-0 -translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-xl whitespace-nowrap z-50">
+            Mi Perfil
+          </div>
+        </Link>
         
-        <div className="group relative flex justify-center cursor-pointer mt-2">
-          <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
-            <span className="text-xs font-bold text-zinc-400 uppercase">
+        <Link href="/perfil" className="group relative flex justify-center cursor-pointer mt-2">
+          <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-violet-500/50 transition-all">
+            <span className="text-xs font-bold text-zinc-400 uppercase group-hover:text-violet-400 transition-colors">
               {userName.slice(0, 2)}
             </span>
           </div>
           <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-zinc-200 text-sm font-medium opacity-0 -translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-xl whitespace-nowrap z-50 flex items-center gap-3">
             <span>{userName}</span>
-            <LogOut size={14} className="text-red-400" />
+            <LogOut size={14} className="text-red-400 hover:text-red-300" onClick={(e) => { e.preventDefault(); /* todo logout */ }} />
           </div>
-        </div>
+        </Link>
       </div>
 
     </nav>
