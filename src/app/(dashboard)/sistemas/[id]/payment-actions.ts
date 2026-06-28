@@ -17,7 +17,7 @@ export async function createPayment(systemId: string, data: {
         systemId,
         date: data.date,
         amount: data.amount,
-        method: data.method || null,
+        method: data.method || "",
         status: data.status,
         observations: data.observations || null
       }
@@ -42,7 +42,7 @@ export async function updatePayment(id: string, data: {
       data: {
         date: data.date,
         amount: data.amount,
-        method: data.method || null,
+        method: data.method || "",
         status: data.status,
         observations: data.observations || null
       }
