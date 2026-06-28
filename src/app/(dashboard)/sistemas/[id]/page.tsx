@@ -5,6 +5,8 @@ import { ArrowLeft, Server, Calendar, Building2, Terminal, Globe, Lock, External
 import { CredentialCard } from "./components/CredentialCard"
 import { NotesEditor } from "./components/NotesEditor"
 import { PaymentsTable } from "./components/PaymentsTable"
+import { UrlsManager } from "./components/UrlsManager"
+import { CredentialsManager } from "./components/CredentialsManager"
 
 export const revalidate = 0
 
@@ -65,48 +67,12 @@ export default async function SystemDetailsPage({ params }: { params: Promise<{ 
         
         {/* COLUMNA IZQUIERDA: URLs */}
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <Globe className="text-blue-400" size={24} />
-            <h2 className="text-2xl font-bold text-white">URLs del Sistema</h2>
-          </div>
-          
-          <div className="space-y-4">
-            {sys.urls.length > 0 ? (
-              sys.urls.map(url => (
-                <a key={url.id} href={url.url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between p-5 rounded-2xl bg-zinc-900/30 border border-white/5 hover:bg-zinc-800/50 hover:border-white/10 transition-all">
-                  <div>
-                    <p className="text-white font-semibold">{url.name}</p>
-                    <p className="text-blue-400 font-mono text-sm mt-1 group-hover:underline">{url.url}</p>
-                  </div>
-                  <ExternalLink size={18} className="text-zinc-500 group-hover:text-white transition-colors" />
-                </a>
-              ))
-            ) : (
-              <div className="p-6 rounded-2xl bg-zinc-900/10 border border-white/5 border-dashed text-center">
-                <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">No hay URLs registradas.</p>
-              </div>
-            )}
-          </div>
+          <UrlsManager systemId={sys.id} initialUrls={sys.urls} />
         </div>
 
         {/* COLUMNA DERECHA: CREDENCIALES */}
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <Lock className="text-emerald-400" size={24} />
-            <h2 className="text-2xl font-bold text-white">Credenciales</h2>
-          </div>
-          
-          <div className="space-y-4">
-            {sys.credentials.length > 0 ? (
-              sys.credentials.map(cred => (
-                <CredentialCard key={cred.id} cred={cred} />
-              ))
-            ) : (
-              <div className="p-6 rounded-2xl bg-zinc-900/10 border border-white/5 border-dashed text-center">
-                <p className="text-zinc-600 font-mono text-sm uppercase tracking-widest">No hay credenciales registradas.</p>
-              </div>
-            )}
-          </div>
+          <CredentialsManager systemId={sys.id} initialCredentials={sys.credentials} />
         </div>
 
       </div>

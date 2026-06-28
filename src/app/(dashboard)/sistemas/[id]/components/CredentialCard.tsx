@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Mail, Eye, Loader2 } from "lucide-react"
+import { Lock, Mail, Eye, Loader2, Trash2 } from "lucide-react"
 import { revealPassword } from "../actions"
 
-export function CredentialCard({ cred }: { cred: { id: string, name: string, username: string | null, password: string } }) {
+export function CredentialCard({ cred, onDelete }: { cred: { id: string, name: string, username: string | null, password: string }, onDelete?: () => void }) {
   const [isRevealed, setIsRevealed] = useState(false)
   const [plainPassword, setPlainPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -38,10 +38,21 @@ export function CredentialCard({ cred }: { cred: { id: string, name: string, use
       {/* Efecto de borde */}
       <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/50" />
       
-      <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-        {isMail ? <Mail size={16} className="text-zinc-400" /> : <Lock size={16} className="text-zinc-400" />}
-        {cred.name}
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-white font-bold flex items-center gap-2">
+          {isMail ? <Mail size={16} className="text-zinc-400" /> : <Lock size={16} className="text-zinc-400" />}
+          {cred.name}
+        </h3>
+        {onDelete && (
+          <button 
+            onClick={onDelete}
+            className="p-1.5 rounded-lg bg-red-500/10 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20"
+            title="Eliminar credencial"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
+      </div>
       
       <div className="grid gap-3">
         <div className="flex items-center justify-between bg-black/40 rounded-xl p-3 border border-white/5">
